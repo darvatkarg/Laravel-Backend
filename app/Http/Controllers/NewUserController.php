@@ -39,7 +39,29 @@ class NewUserController extends Controller
         }
     }
 
-    //Login API
+    //1. Login API without session
+    // function loginUser(Request $req)
+    // {
+    //     try {
+    //         $user = Newuser::where('email', $req->email)->first();
+    //         if (!$user || !Hash::check($req->password, $user->password)) {
+    //             return response()->json([
+    //                 'message' => 'Invalid credentials'
+    //             ], 400);
+    //         } else {
+    //             return response()->json([
+    //                 'message' => 'User found',
+    //                 'data' => $user
+    //             ], 200);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             "message" => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    //2. Login API with session
     function loginUser(Request $req)
     {
         try {
@@ -49,6 +71,9 @@ class NewUserController extends Controller
                     'message' => 'Invalid credentials'
                 ], 400);
             } else {
+                // Start a session for the user
+                $req->session()->put('user', $user->id);
+
                 return response()->json([
                     'message' => 'User found',
                     'data' => $user
@@ -60,6 +85,17 @@ class NewUserController extends Controller
             ], 500);
         }
     }
+
+    // Logout API
+    function logout(Request $req)
+    {
+        $req->session()->flush();
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ], 200);
+    }
+
+
 
     //FindAllUsers API
     function findAllUsers()
@@ -84,9 +120,34 @@ class NewUserController extends Controller
         }
     }
 
-    //Find User by id API
-    function findUser($id)
+    //1. Find User by id API(When not logged in)
+    // function findUser($id)
+    // {
+    //     try {
+    //         $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
+    //         if (!$user) {
+    //             return response()->json([
+    //                 'message' => "User not found",
+    //             ], 400);
+    //         } else {
+    //             return response()->json([
+    //                 'message' => "User found",
+    //                 'data' => $user
+    //             ], 200);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+    //2. Find User by id API(When logged in)
+    function findUser(Request $req)
     {
+        // Get the user's ID from the session
+        $id = $req->session()->get('user')->id;
+
         try {
             $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
             if (!$user) {
@@ -105,6 +166,7 @@ class NewUserController extends Controller
             ], 500);
         }
     }
+
 
     //Delete API
     function deleteUser($id)
@@ -146,7 +208,7 @@ class NewUserController extends Controller
                 'message' => "User has been updated"
             ], 200);
         } catch (\Exception $e) {
-            return  response()->json([
+            return response()->json([
                 'message' => $e->getMessage()
             ], 500);
         }
