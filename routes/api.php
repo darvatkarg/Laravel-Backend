@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 // Route::controller(NewUserController::class)->group(function () {
 //     Route::post('register', 'addUser');
@@ -31,9 +31,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // });
 
 
-Route::middleware(['web'])->group(function () {
-    Route::post('register', [NewUserController::class, 'addUser']);
-    Route::post('login', [NewUserController::class, 'loginUser']);
+// Route::middleware(['web'])->group(function () {
+//     Route::post('register', [NewUserController::class, 'addUser']);
+//     Route::post('login', [NewUserController::class, 'loginUser']);
+//     Route::get('logout', [NewUserController::class, 'logout']);
+//     Route::get('findall', [NewUserController::class, 'findAllUsers']);
+//     Route::get('find', [NewUserController::class, 'findUser']);
+//     Route::put('update/{id}', [NewUserController::class, 'updateUser']);
+//     Route::delete('delete/{id}', [NewUserController::class, 'deleteUser']);
+// });
+
+
+//For tokens
+
+Route::post('register', [NewUserController::class, 'addUser']);
+Route::post('login', [NewUserController::class, 'loginUser']);
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('logout', [NewUserController::class, 'logout']);
     Route::get('findall', [NewUserController::class, 'findAllUsers']);
     Route::get('find', [NewUserController::class, 'findUser']);
