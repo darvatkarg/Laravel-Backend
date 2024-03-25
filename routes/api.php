@@ -19,24 +19,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::controller(NewUserController::class)->group(function () {
-//     Route::post('register', 'addUser');
-//     Route::post('login', 'loginUser');
-//     Route::get('logout', 'logout');
-//     Route::get('findall', 'findAllUsers');
-//     Route::get('find/{id}', 'findUser');  This route will be used when we are not using session.
-//     Route::get('find', 'findUser');
-//     Route::put('update/{id}', 'updateUser');
-//     Route::delete('delete/{id}', 'deleteUser');
-// });
-
-
-Route::middleware(['web'])->group(function () {
-    Route::post('register', [NewUserController::class, 'addUser']);
-    Route::post('login', [NewUserController::class, 'loginUser']);
-    Route::get('logout', [NewUserController::class, 'logout']);
-    Route::get('findall', [NewUserController::class, 'findAllUsers']);
-    Route::get('find', [NewUserController::class, 'findUser']);
-    Route::put('update/{id}', [NewUserController::class, 'updateUser']);
-    Route::delete('delete/{id}', [NewUserController::class, 'deleteUser']);
+Route::controller(NewUserController::class)->group(function () {
+    Route::post('register', 'addUser');
+    Route::post('login', 'loginUser');
+    Route::get('logout', 'logout');
+    Route::get('findall', 'findAllUsers');
+    //This route will be used when we are not using session.
+    // Route::get('find/{id}', 'findUser');
+    Route::get('find', 'findUser');
+    Route::put('update/{id}', 'updateUser');
+    Route::delete('delete/{id}', 'deleteUser');
 });
+
+
+// Route::middleware(['web'])->group(function () {
+//     Route::post('register', [NewUserController::class, 'addUser']);
+//     Route::post('login', [NewUserController::class, 'loginUser']);
+//     Route::get('logout', [NewUserController::class, 'logout']);
+//     Route::get('findall', [NewUserController::class, 'findAllUsers']);
+//     Route::get('find', [NewUserController::class, 'findUser']);
+//     Route::put('update/{id}', [NewUserController::class, 'updateUser']);
+//     Route::delete('delete/{id}', [NewUserController::class, 'deleteUser']);
+// });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Newuser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class NewUserController extends Controller
 {
@@ -73,6 +74,11 @@ class NewUserController extends Controller
             } else {
                 // Start a session for the user
                 $req->session()->put('user', $user->id);
+
+                // Manually set the user_id field in the sessions table
+                DB::table('sessions')
+                    ->where('id', $req->session()->getId())
+                    ->update(['user_id' => $user->id]);
 
                 return response()->json([
                     'message' => 'User found',
@@ -146,7 +152,7 @@ class NewUserController extends Controller
     function findUser(Request $req)
     {
         // Get the user's ID from the session
-        $id = $req->session()->get('user')->id;
+        $id = $req->session()->get('user');
 
         try {
             $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
