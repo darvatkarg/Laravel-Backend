@@ -39,184 +39,7 @@ class NewUserController extends Controller
         }
     }
 
-    //1. Login API without session
-    // function loginUser(Request $req)
-    // {
-    //     try {
-    //         $user = Newuser::where('email', $req->email)->first();
-    //         if (!$user || !Hash::check($req->password, $user->password)) {
-    //             return response()->json([
-    //                 'message' => 'Invalid credentials'
-    //             ], 400);
-    //         } else {
-    //             return response()->json([
-    //                 'message' => 'User found',
-    //                 'data' => $user
-    //             ], 200);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             "message" => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
-    //2. Login API with session
-    // function loginUser(Request $req)
-    // {
-    //     try {
-    //         $user = Newuser::where('email', $req->email)->first();
-    //         if (!$user || !Hash::check($req->password, $user->password)) {
-    //             return response()->json([
-    //                 'message' => 'Invalid credentials'
-    //             ], 400);
-    //         } else {
-    //             // Start a session for the user
-    //             $req->session()->put('user', $user->id);
-
-    //             return response()->json([
-    //                 'message' => 'User found',
-    //                 'data' => $user
-    //             ], 200);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             "message" => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
-    // Logout API
-    // function logout(Request $req)
-    // {
-    //     $req->session()->flush();
-    //     return response()->json([
-    //         'message' => 'Logged out successfully',
-    //     ], 200);
-    // }
-
-
-
-    //FindAllUsers API
-    function findAllUsers()
-    {
-        try {
-            $users = Newuser::all(['id', 'first_name', 'last_name', 'email']);
-
-            if ($users->count() > 0) {
-                return response()->json([
-                    'message' => "Users found",
-                    'data' => $users
-                ], 200);
-            } else {
-                return response()->json([
-                    'message' => "No users found",
-                ], 400);
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    //1. Find User by id API(When not logged in)
-    // function findUser($id)
-    // {
-    //     try {
-    //         $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
-    //         if (!$user) {
-    //             return response()->json([
-    //                 'message' => "User not found",
-    //             ], 400);
-    //         } else {
-    //             return response()->json([
-    //                 'message' => "User found",
-    //                 'data' => $user
-    //             ], 200);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'message' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
-    //2. Find User by id API(When logged in)
-    // function findUser(Request $req)
-    // {
-    //     // Get the user's ID from the session
-    //     $id = $req->session()->get('user')->id;
-
-    //     try {
-    //         $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
-    //         if (!$user) {
-    //             return response()->json([
-    //                 'message' => "User not found",
-    //             ], 400);
-    //         } else {
-    //             return response()->json([
-    //                 'message' => "User found",
-    //                 'data' => $user
-    //             ], 200);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'message' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
-
-    //Delete API
-    function deleteUser($id)
-    {
-        try {
-            $user = Newuser::find($id);
-            $user->delete();
-            return response()->json([
-                'message' => "User deleted successfully!"
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    //Update API
-    function updateUser($id, Request $req)
-    {
-        try {
-            $user = Newuser::find($id);
-
-            if ($req->has('first_name')) {
-                $user->first_name = $req->first_name;
-            }
-            if ($req->has('last_name')) {
-                $user->last_name = $req->last_name;
-            }
-            if ($req->has('email')) {
-                $req->validate([
-                    'email' => ['email'],
-                ]);
-                $user->email = $req->email;
-            }
-            $user->save();
-            return response()->json([
-                'data' => $user,
-                'message' => "User has been updated"
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-}
-
-
-//Code while using token from sanctum
+    //Code while using token from sanctum
 
 // Login Function
 function loginUser(Request $req)
@@ -266,4 +89,74 @@ function logout(Request $req)
     return response()->json([
         'message' => 'Logged out successfully',
     ], 200);
+}
+
+    //FindAllUsers API
+    function findAllUsers()
+    {
+        try {
+            $users = Newuser::all(['id', 'first_name', 'last_name', 'email']);
+
+            if ($users->count() > 0) {
+                return response()->json([
+                    'message' => "Users found",
+                    'data' => $users
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => "No users found",
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    //Delete API
+    function deleteUser($id)
+    {
+        try {
+            $user = Newuser::find($id);
+            $user->delete();
+            return response()->json([
+                'message' => "User deleted successfully!"
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    //Update API
+    function updateUser($id, Request $req)
+    {
+        try {
+            $user = Newuser::find($id);
+
+            if ($req->has('first_name')) {
+                $user->first_name = $req->first_name;
+            }
+            if ($req->has('last_name')) {
+                $user->last_name = $req->last_name;
+            }
+            if ($req->has('email')) {
+                $req->validate([
+                    'email' => ['email'],
+                ]);
+                $user->email = $req->email;
+            }
+            $user->save();
+            return response()->json([
+                'data' => $user,
+                'message' => "User has been updated"
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

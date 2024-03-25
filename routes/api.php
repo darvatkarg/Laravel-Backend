@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
+//For session
 // Route::middleware(['web'])->group(function () {
 //     Route::post('register', [NewUserController::class, 'addUser']);
 //     Route::post('login', [NewUserController::class, 'loginUser']);
