@@ -41,55 +41,62 @@ class NewUserController extends Controller
 
     //Code while using token from sanctum
 
-// Login Function
-function loginUser(Request $req)
-{
-    $user = Newuser::where('email', $req->email)->first();
-    if (!$user || !Hash::check($req->password, $user->password)) {
-        return response()->json([
-            'message' => 'Invalid credentials'
-        ], 400);
-    } else {
-        // Create a token for the user
-        $token = $user->createToken('api-token')->plainTextToken;
+    // Login Function
+    function loginUser(Request $req)
+    {
+        $user = Newuser::where('email', $req->email)->first();
+        if (!$user || !Hash::check($req->password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 400);
+        } else {
+            // Create a token for the user
+            $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'User found',
-            'data' => $user,
-            'token' => $token
-        ], 200);
+            return response()->json([
+                'message' => 'User found',
+                'data' => $user,
+                'token' => $token
+            ], 200);
+        }
     }
-}
 
-// Find User Function
-function findUser(Request $req)
-{
-    // Get the user's ID from the token
-    $id = $req->user()->id;
+    // Find User Function
+    function findUser(Request $req)
+    {
+        // Get the user's ID from the token
+        $id = $req->user()->id;
 
-    $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
-    if (!$user) {
-        return response()->json([
-            'message' => "User not found",
-        ], 400);
-    } else {
-        return response()->json([
-            'message' => "User found",
-            'data' => $user
-        ], 200);
+        $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
+        if (!$user) {
+            return response()->json([
+                'message' => "User not found",
+            ], 400);
+        } else {
+            return response()->json([
+                'message' => "User found",
+                'data' => $user
+            ], 200);
+        }
     }
-}
 
-// Logout Function
-function logout(Request $req)
-{
-    // Revoke the user's token
-    $req->user()->currentAccessToken()->delete();
+    // Logout Function
+    function logout(Request $req)
+    {
+        try {
+            // Revoke the user's token
+            $req->user()->currentAccessToken()->delete();
 
-    return response()->json([
-        'message' => 'Logged out successfully',
-    ], 200);
-}
+            return response()->json([
+                'message' => 'Logged out successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+    }
 
     //FindAllUsers API
     function findAllUsers()
