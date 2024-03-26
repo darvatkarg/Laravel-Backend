@@ -47,10 +47,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register', [NewUserController::class, 'addUser']);
 Route::post('login', [NewUserController::class, 'loginUser']);
-Route::put('update/{id}', [NewUserController::class, 'updateUser']);
-Route::delete('delete/{id}', [NewUserController::class, 'deleteUser']);
-Route::get('findall', [NewUserController::class, 'findAllUsers']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('logout', [NewUserController::class, 'logout']);
     Route::get('find', [NewUserController::class, 'findUser']);
+    Route::put('update', [NewUserController::class, 'updateUser']);
+    Route::delete('delete', [NewUserController::class, 'deleteUser']);
+    Route::get('findall', [NewUserController::class, 'findAllUsers']);
 });

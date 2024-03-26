@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Newuser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cookie;
 
 class NewUserController extends Controller
 {
@@ -53,11 +54,16 @@ class NewUserController extends Controller
             // Create a token for the user
             $token = $user->createToken('api-token')->plainTextToken;
 
+            // Set a cookie with the token
+            $cookie = cookie('token', $token, 60);
+            // Below cookie will expire in 60 minutes, is secure and httpOnly
+            // $cookie = cookie('token', $token, 60, null, null, false, false);
+
             return response()->json([
                 'message' => 'User found',
                 'data' => $user,
                 'token' => $token
-            ], 200);
+            ], 200)->withCookie($cookie);
         }
     }
 
@@ -87,16 +93,19 @@ class NewUserController extends Controller
             // Revoke the user's token
             $req->user()->currentAccessToken()->delete();
 
+            // Clear the cookie
+            $cookie = Cookie::forget('token');
+
             return response()->json([
                 'message' => 'Logged out successfully',
-            ], 200);
+            ], 200)->withCookie($cookie);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 500);
         }
-
     }
+
 
     //FindAllUsers API
     function findAllUsers()
@@ -122,11 +131,15 @@ class NewUserController extends Controller
     }
 
     //Delete API
-    function deleteUser($id)
+    function deleteUser(Request $req)
     {
         try {
-            $user = Newuser::find($id);
+            // Get the authenticated user
+            $user = $req->user();
+
+            // Delete the user
             $user->delete();
+
             return response()->json([
                 'message' => "User deleted successfully!"
             ], 200);
@@ -137,11 +150,13 @@ class NewUserController extends Controller
         }
     }
 
+
     //Update API
-    function updateUser($id, Request $req)
+    function updateUser(Request $req)
     {
         try {
-            $user = Newuser::find($id);
+            // Get the authenticated user
+            $user = $req->user();
 
             if ($req->has('first_name')) {
                 $user->first_name = $req->first_name;
@@ -156,6 +171,7 @@ class NewUserController extends Controller
                 $user->email = $req->email;
             }
             $user->save();
+
             return response()->json([
                 'data' => $user,
                 'message' => "User has been updated"
