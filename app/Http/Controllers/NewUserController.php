@@ -64,27 +64,30 @@ class NewUserController extends Controller
     // Find User Function
     function findUser(Request $req)
     {
-        // Get the user's ID from the token
-        $id = $req->user()->id;
+        try {
+            $id = $req->user()->id;
+            $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
 
-        $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
-        if (!$user) {
+            if (!$user) {
+                return response()->json([
+                    'message' => "User not found",
+                ], 400);
+            } else {
+                return response()->json([
+                    'message' => "User found",
+                    'data' => $user
+                ], 200);
+            }
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => "User not found",
+                'message' => "User doesn't exist or token is wrong",
             ], 400);
-        } else {
-            return response()->json([
-                'message' => "User found",
-                'data' => $user
-            ], 200);
         }
     }
 
-    // Logout Function
     function logout(Request $req)
     {
         try {
-            // Revoke the user's token
             $req->user()->currentAccessToken()->delete();
 
             return response()->json([
@@ -95,7 +98,6 @@ class NewUserController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
-
     }
 
     //FindAllUsers API
@@ -122,25 +124,38 @@ class NewUserController extends Controller
     }
 
     //Delete API
-    function deleteUser($id)
+    function deleteUser(Request $req)
     {
         try {
+            $id = $req->user()->id;
             $user = Newuser::find($id);
-            $user->delete();
-            return response()->json([
-                'message' => "User deleted successfully!"
-            ], 200);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => "User not found",
+                ], 400);
+            } else {
+                // Delete the user
+                // $user->delete();
+
+                return response()->json([
+                    'message' => "User deleted successfully",
+                ], 200);
+            }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
+                'message' => "User doesn't exist or token is wrong",
+            ], 400);
         }
     }
 
     //Update API
-    function updateUser($id, Request $req)
+    function updateUser(Request $req)
     {
         try {
+
+            $id = $req->user()->id;
+
             $user = Newuser::find($id);
 
             if ($req->has('first_name')) {
@@ -162,7 +177,7 @@ class NewUserController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => $e->getMessage()
+                'message' => "User doesn't exist or token is wrong"
             ], 500);
         }
     }
