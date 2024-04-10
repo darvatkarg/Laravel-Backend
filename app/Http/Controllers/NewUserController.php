@@ -123,6 +123,30 @@ class NewUserController extends Controller
         }
     }
 
+    // Find User using token
+    function findUserByToken(Request $req)
+    {
+        try {
+            $id = $req->user()->id;
+            $user = Newuser::find($id, ['first_name', 'last_name']);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => "User not found",
+                ], 400);
+            } else {
+                return response()->json([
+                    'message' => "User found",
+                    'data' => $user
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
     //Delete API
     function deleteUser(Request $req, $id)
     {

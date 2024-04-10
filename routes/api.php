@@ -53,4 +53,5 @@ Route::get('findall', [NewUserController::class, 'findAllUsers']);
 Route::get('find/{id}', [NewUserController::class, 'findUser']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('logout', [NewUserController::class, 'logout']);
+    Route::get('finduser', [NewUserController::class, 'findUserByToken']);
 });
