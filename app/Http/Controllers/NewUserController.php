@@ -62,10 +62,10 @@ class NewUserController extends Controller
     }
 
     // Find User Function
-    function findUser(Request $req)
+    function findUser(Request $req, $id)
     {
         try {
-            $id = $req->user()->id;
+            // $id = $req->user()->id;
             $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
 
             if (!$user) {
@@ -80,7 +80,7 @@ class NewUserController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "User doesn't exist or token is wrong",
+                'message' => $e->getMessage(),
             ], 400);
         }
     }
@@ -124,10 +124,10 @@ class NewUserController extends Controller
     }
 
     //Delete API
-    function deleteUser(Request $req)
+    function deleteUser(Request $req, $id)
     {
         try {
-            $id = $req->user()->id;
+            // $id = $req->user()->id;
             $user = Newuser::find($id);
 
             if (!$user) {
@@ -137,7 +137,7 @@ class NewUserController extends Controller
             } else {
 
                 // Delete the user's tokens
-                $user->tokens()->delete();
+                // $user->tokens()->delete();
 
                 // Delete the user
                 $user->delete();
@@ -148,17 +148,17 @@ class NewUserController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "User doesn't exist or token is wrong",
+                'message' => $e->getMessage(),
             ], 400);
         }
     }
 
     //Update API
-    function updateUser(Request $req)
+    function updateUser(Request $req, $id)
     {
         try {
 
-            $id = $req->user()->id;
+            // $id = $req->user()->id;
 
             $user = Newuser::find($id);
 
@@ -181,7 +181,7 @@ class NewUserController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "User doesn't exist or token is wrong"
+                'message' => $e->getMessage()
             ], 500);
         }
     }
