@@ -135,8 +135,12 @@ class NewUserController extends Controller
                     'message' => "User not found",
                 ], 400);
             } else {
+
+                // Delete the user's tokens
+                $user->tokens()->delete();
+
                 // Delete the user
-                // $user->delete();
+                $user->delete();
 
                 return response()->json([
                     'message' => "User deleted successfully",
