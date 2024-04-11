@@ -11,7 +11,7 @@ class Newuser extends Model
 {
     use HasFactory, HasApiTokens, Notifiable;
 
-    public $fillable = ['first_name', 'last_name', 'email', 'password'];
+    public $fillable = ['first_name', 'last_name', 'email', 'password', 'image_path'];
 
     public $hidden = ['password'];
 }

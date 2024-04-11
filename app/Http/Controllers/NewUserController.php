@@ -19,6 +19,7 @@ class NewUserController extends Controller
                 'last_name' => 'required',
                 'email' => ['required', 'email'],
                 'password' => ['required', 'min:8'],
+                'image' => ['required', 'image'], // Add validation for image
             ]);
 
             $user = new Newuser;
@@ -26,6 +27,21 @@ class NewUserController extends Controller
             $user->last_name = $req->last_name;
             $user->email = $req->email;
             $user->password = Hash::make($req->password);
+
+            if ($req->hasFile('image')) {
+                //To store image name as it is
+                // $path = $req->file('image')->store('images', 'public');
+                // $user->image_path = $path;
+
+                //To give a custom name to the image
+                $file = $req->file('image');
+                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $timestamp = now()->timestamp;
+                $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
+                $path = $file->storeAs('images', $newFilename, 'public');
+                $user->image_path = $path;
+            }
+
             $user->save();
 
             return response()->json([
@@ -66,13 +82,19 @@ class NewUserController extends Controller
     {
         try {
             // $id = $req->user()->id;
-            $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email']);
+            $user = Newuser::find($id, ['id', 'first_name', 'last_name', 'email', 'image_path']);
 
             if (!$user) {
                 return response()->json([
                     'message' => "User not found",
                 ], 400);
             } else {
+
+                //Code to show image
+                if ($user->image_path) {
+                    $user->image_path = url('/storage/' . $user->image_path);
+                }
+
                 return response()->json([
                     'message' => "User found",
                     'data' => $user
@@ -104,9 +126,14 @@ class NewUserController extends Controller
     function findAllUsers()
     {
         try {
-            $users = Newuser::all(['id', 'first_name', 'last_name', 'email']);
+            $users = Newuser::all(['id', 'first_name', 'last_name', 'email', 'image_path']);
 
             if ($users->count() > 0) {
+                foreach ($users as $user) {
+                    if ($user->image_path) {
+                        $user->image_path = url('/storage/' . $user->image_path);
+                    }
+                }
                 return response()->json([
                     'message' => "Users found",
                     'data' => $users
@@ -128,13 +155,16 @@ class NewUserController extends Controller
     {
         try {
             $id = $req->user()->id;
-            $user = Newuser::find($id, ['first_name', 'last_name']);
+            $user = Newuser::find($id, ['first_name', 'last_name', 'image_path']);
 
             if (!$user) {
                 return response()->json([
                     'message' => "User not found",
                 ], 400);
             } else {
+                if ($user->image_path) {
+                    $user->image_path = url('/storage/' . $user->image_path);
+                }
                 return response()->json([
                     'message' => "User found",
                     'data' => $user
@@ -198,6 +228,20 @@ class NewUserController extends Controller
                 ]);
                 $user->email = $req->email;
             }
+            // Handle the image upload
+            if ($req->hasFile('image')) {
+                $req->validate([
+                    'image' => ['image'], // Add validation for image
+                ]);
+
+                $file = $req->file('image');
+                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $timestamp = now()->timestamp;
+                $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
+                $path = $file->storeAs('images', $newFilename, 'public');
+                $user->image_path = $path;
+            }
+
             $user->save();
             return response()->json([
                 'data' => $user,
