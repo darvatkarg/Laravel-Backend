@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Newuser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Welcomemail;
+use Illuminate\Support\Facades\Log;
 
 class NewUserController extends Controller
 {
@@ -46,6 +49,11 @@ class NewUserController extends Controller
             }
 
             $user->save();
+
+            // Send email after successful registration
+            Mail::to($user->email)->send(new WelcomeMail());
+
+            Log::info('Email sent successfully to ' . $user->email);
 
             return response()->json([
                 'message' => 'User registered successfully',
