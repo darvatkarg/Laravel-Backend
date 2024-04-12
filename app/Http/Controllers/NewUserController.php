@@ -232,18 +232,22 @@ class NewUserController extends Controller
                 $user->email = $req->email;
             }
             // Handle the image upload
-            if ($req->hasFile('image')) {
-                $req->validate([
-                    'image' => ['image'], // Add validation for image
-                ]);
+            // if ($req->hasFile('image')) {
+            //     $req->validate([
+            //         'image' => ['image'], // Add validation for image
+            //     ]);
 
-                $file = $req->file('image');
-                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $timestamp = now()->timestamp;
-                $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
-                $path = $file->storeAs('images', $newFilename, 'public');
-                $user->image_path = $path;
-            }
+            //     //To give a custom name to the image
+            //     $file = $req->file('image');
+            //     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            //     $timestamp = now()->timestamp;
+            //     $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
+            //     // Move the file to the desired directory
+            //     $file->move(public_path('storage/images'), $newFilename);
+
+            //     // Save the path (relative to the public directory) in the database
+            //     $user->image_path = 'storage/images/' . $newFilename;
+            // }
 
             $user->save();
             return response()->json([
