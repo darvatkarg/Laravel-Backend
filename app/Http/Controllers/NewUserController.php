@@ -38,8 +38,11 @@ class NewUserController extends Controller
                 $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $timestamp = now()->timestamp;
                 $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
-                $path = $file->storeAs('images', $newFilename, 'public');
-                $user->image_path = $path;
+                // Move the file to the desired directory
+                $file->move(public_path('storage/images'), $newFilename);
+
+                // Save the path (relative to the public directory) in the database
+                $user->image_path = 'storage/images/' . $newFilename;
             }
 
             $user->save();
@@ -92,7 +95,7 @@ class NewUserController extends Controller
 
                 //Code to show image
                 if ($user->image_path) {
-                    $user->image_path = url('/storage/' . $user->image_path);
+                    $user->image_path = url('/' . $user->image_path);
                 }
 
                 return response()->json([
@@ -131,7 +134,7 @@ class NewUserController extends Controller
             if ($users->count() > 0) {
                 foreach ($users as $user) {
                     if ($user->image_path) {
-                        $user->image_path = url('/storage/' . $user->image_path);
+                        $user->image_path = url('/' . $user->image_path);
                     }
                 }
                 return response()->json([
@@ -163,7 +166,7 @@ class NewUserController extends Controller
                 ], 400);
             } else {
                 if ($user->image_path) {
-                    $user->image_path = url('/storage/' . $user->image_path);
+                    $user->image_path = url('/' . $user->image_path);
                 }
                 return response()->json([
                     'message' => "User found",
