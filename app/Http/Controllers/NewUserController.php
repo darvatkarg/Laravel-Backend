@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Welcomemail;
+use App\Mail\LoginMail;
 use Illuminate\Support\Facades\Log;
 
 class NewUserController extends Controller
@@ -79,6 +80,11 @@ class NewUserController extends Controller
         } else {
             // Create a token for the user
             $token = $user->createToken('api-token')->plainTextToken;
+
+            // Send email after successful registration
+            Mail::to($user->email)->send(new LoginMail());
+
+            Log::info('Login Email sent successfully to ' . $user->email);
 
             return response()->json([
                 'message' => 'User found',
