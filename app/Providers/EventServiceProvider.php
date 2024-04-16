@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Database\Events\QueryExecuted;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,14 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+
+        parent::boot();
+
+        Event::listen(QueryExecuted::class, function (QueryExecuted $event) {
+            \Log::info('SQL Query: ' . $event->sql);
+            \Log::info('Query Parameters: ' . json_encode($event->bindings));
+            \Log::info('Query Execution Time: ' . $event->time . 'ms');
+        });
     }
 
     /**
