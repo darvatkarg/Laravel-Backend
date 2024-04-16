@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\Welcomemail;
 use App\Mail\LoginMail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class NewUserController extends Controller
 {
@@ -233,6 +234,8 @@ class NewUserController extends Controller
 
             $user = Newuser::find($id);
 
+            Log::info(print_r($req->all(), true));
+
             if ($req->has('first_name')) {
                 $user->first_name = $req->first_name;
             }
@@ -246,29 +249,36 @@ class NewUserController extends Controller
                 $user->email = $req->email;
             }
             // Handle the image upload
-            // if ($req->hasFile('image')) {
-            //     $req->validate([
-            //         'image' => ['image'], // Add validation for image
-            //     ]);
+            if ($req->hasFile('image')) {
+                $req->validate([
+                    'image' => ['image'], // Add validation for image
+                ]);
 
-            //     //To give a custom name to the image
-            //     $file = $req->file('image');
-            //     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            //     $timestamp = now()->timestamp;
-            //     $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
-            //     // Move the file to the desired directory
-            //     $file->move(public_path('storage/images'), $newFilename);
+                // Delete the old image
+                if ($user->image_path) {
+                    Storage::delete(public_path($user->image_path));
+                }
 
-            //     // Save the path (relative to the public directory) in the database
-            //     $user->image_path = 'storage/images/' . $newFilename;
-            // }
+                //To give a custom name to the image
+                $file = $req->file('image');
+                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $timestamp = now()->timestamp;
+                $newFilename = "{$filename}-{$timestamp}-{$user->first_name}.{$file->getClientOriginalExtension()}";
+                // Move the file to the desired directory
+                $file->move(public_path('storage/images'), $newFilename);
+
+                // Save the path (relative to the public directory) in the database
+                $user->image_path = 'storage/images/' . $newFilename;
+            }
 
             $user->save();
+            Log::info("User updated successfully: {$user}");
             return response()->json([
                 'data' => $user,
                 'message' => "User has been updated"
             ], 200);
         } catch (\Exception $e) {
+            Log::error("Error updating user: {$e->getMessage()}");
             return response()->json([
                 'message' => $e->getMessage()
             ], 500);
