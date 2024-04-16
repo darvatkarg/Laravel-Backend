@@ -230,8 +230,6 @@ class NewUserController extends Controller
     {
         try {
 
-            // $id = $req->user()->id;
-
             $user = Newuser::find($id);
 
             Log::info(print_r($req->all(), true));
